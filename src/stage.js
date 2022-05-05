@@ -219,5 +219,74 @@ class Stage {
         }
         return null;
     }
-    //次回ここから
+    // 消すアニメーションをする
+    static erasing(frame) {
+        const elapsedFrame = frame - this.eraseStartFrame;
+        const ratio = elapsedFrame / Config.eraseAnimetionDuration;
+        if (ratio > 1) {
+            // アニメーションを終了する
+            for (const info of this.erasingPuyoInfoList) {
+                var element = info.cell.element;
+                this.stageElement.removeChild(element);
+            }
+            return false;
+        } else if (ratio > 0.75) {
+            for (const info of this.erasingPuyoInfoList) {
+                var element = info.cell.element;
+                element.style.display = 'block';
+            }
+            return true;
+        } else if (ratio > 0.50) {
+            for (const info of this.erasingPuyoInfoList) {
+                var element = info.cell.element;
+                element.style.display = 'none';
+            }
+            return true;
+        } else if (ratio > 0.25) {
+            for (const info of this.erasingPuyoInfoList) {
+                var element = info.cell.element;
+                element.style.display = 'block';
+            }
+            return true;
+        } else {
+            for (const info of this.erasingPuyoInfoList) {
+                var element = info.cell.element;
+                element.style.display = 'none';
+            }
+            return true;
+        }
+    }
+
+    static showZenkeshi() {
+        // 全消しを表示する
+        this.zenkeshiImage.style.display = 'block';
+        this.zenkeshiImage.style.opacity = '1';
+        const starTime = Date.now();
+        const startTop = Config.puyoImgHeight * Config.stageRows;
+        const endTop = Config.puyoImgHeight * Config.stageRows / 3;
+        const animetion = () => {
+            const ratio = Math.min((Date.now() - startTime) / Config.zenkeshiDuration, 1);
+            this.zenkeshiImage.style.top = (endTop - startTop) * ratio + startTop + 'px';
+            if (ratio != 1) {
+                requestAnimationFrame(animetion);
+            }
+        };
+        animetion();
+    }
+    static hideZenkeshi() {
+        // 全消しを消去する
+        const startTime = Date.now();
+        const animetion = () => {
+            const ratio = Math.min((Date.now() - startTime) / Config.zenkeshiDuration, 1);
+            this.zenkeshiImage.style.opacity = String(1 - ratio);
+            if (ratio != 1) {
+                requestAnimationFrame(animetion);
+            } else {
+                this.zenkeshiImage.style.display = 'none';
+            }
+        };
+        animetion();
+    }
 }
+Stage.fallingPuyoList = [];
+Stage.erasingPuyoInfoList = [];
